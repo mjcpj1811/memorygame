@@ -14,6 +14,7 @@ public class ClientHandler implements Runnable {
     private ObjectInputStream input;
     private ObjectOutputStream output;
     private UserDAO userDAO = new UserDAO();
+    private String currentUsername = null;
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
@@ -35,6 +36,9 @@ public class ClientHandler implements Runnable {
         } catch (Exception e) {
             System.out.println("Client disconnected: " + e.getMessage());
         } finally {
+            if(currentUsername != null) {
+                userDAO.setOffline(currentUsername);
+            }
             try { socket.close(); } catch (IOException ignored) {}
         }
     }
@@ -56,11 +60,17 @@ public class ClientHandler implements Runnable {
                 String password = (String) req.get("password");
                 User user = userDAO.checkUser(username, password);
                 if (user != null) {
+                    currentUsername = username;
                     Response res = new Response(true, "Đăng nhập thành công");
                     res.put("user", user);
                     return res;
                 }
                 return new Response(false, "Sai tên đăng nhập hoặc mật khẩu");
+            }
+
+            case "logout" -> {
+                boolean ok = userDAO.setOffline(currentUsername);
+                return new Response(true, "Đăng xuất thành công");
             }
 
             default -> { return new Response(false, "Yêu cầu không hợp lệ"); }

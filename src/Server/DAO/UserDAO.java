@@ -49,20 +49,34 @@ public class UserDAO {
             return null;
         }
         if (user != null) {
-            updateUserStatus(username);
+            setOnline(username);
         }
         return user;
     }
 
 
-    public void updateUserStatus(String username) {
-        String sql = "UPDATE Users SET status='ONLINE' WHERE username=?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+    public void setOnline(String username) {
+        String query = "UPDATE Users SET status='ONLINE' WHERE username=?";
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setString(1, username);
             ps.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("updateUserStatus error: " + e.getMessage());
+            System.err.println("Set online error: " + e.getMessage());
         }
+    }
+
+    public boolean setOffline(String username){
+         String query = "UPDATE Users SET status='OFFLINE' WHERE username=?";
+         try (Connection connection = DatabaseConnection.getConnection();
+                PreparedStatement ps =connection.prepareStatement(query)){
+             ps.setString(1, username);
+             ps.executeUpdate();
+             return true;
+         }catch (SQLException e){
+             System.err.println("Set offline error: " + e.getMessage());
+             return false;
+         }
     }
 }

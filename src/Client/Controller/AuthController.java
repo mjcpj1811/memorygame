@@ -25,4 +25,9 @@ public class AuthController {
         req.put("password", password);
         return connection.sendRequest(req);
     }
+
+    public Response logout() {
+        Request req = new Request("logout");
+        return connection.sendRequest(req);
+    }
 }
