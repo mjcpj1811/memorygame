@@ -1,14 +1,14 @@
 package Server.model;
-import Server.model.User;
-import Server.model.Match;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 public class MatchDetail implements Serializable {
     private int totalScore;
     private double playTime;
     private User user;
     private Match match;
+    private Timestamp createdAt;
 
     public MatchDetail() {};
 
@@ -17,6 +17,14 @@ public class MatchDetail implements Serializable {
         this.playTime = playTime;
         this.user = user;
         this.match = match;
+    }
+
+    public MatchDetail(int totalScore, double playTime, User user, Match match, Timestamp createdAt) {
+        this.totalScore = totalScore;
+        this.playTime = playTime;
+        this.user = user;
+        this.match = match;
+        this.createdAt = createdAt;
     }
 
     public int getTotalScore() {
@@ -49,5 +57,13 @@ public class MatchDetail implements Serializable {
 
     public void setMatch(Match match) {
         this.match = match;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 }
