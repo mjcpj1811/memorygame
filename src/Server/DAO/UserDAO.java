@@ -8,20 +8,20 @@ import java.util.UUID;
 
 public class UserDAO {
 
-        public boolean registerUser (User user) {
-            String query = "INSERT INTO users (id, username, password, email, status, createdAt) VALUES (?, ?, ?, ?, ?, ?)";
-            try(Connection connection = DatabaseConnection.getConnection();
-                PreparedStatement ps = connection.prepareStatement(query)) {
-                ps.setString(1, UUID.randomUUID().toString());
-                ps.setString(2, user.getUsername());
-                ps.setString(3, user.getPassword());
-                ps.setString(4, user.getEmail());
-                ps.setString(5, "OFFLINE");
-                ps.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
-                int rows = ps.executeUpdate();
+    public boolean registerUser (User user) {
+        String query = "INSERT INTO users (id, username, password, email, status, createdAt) VALUES (?, ?, ?, ?, ?, ?)";
+        try(Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setString(1, UUID.randomUUID().toString());
+            ps.setString(2, user.getUsername());
+            ps.setString(3, user.getPassword());
+            ps.setString(4, user.getEmail());
+            ps.setString(5, "OFFLINE");
+            ps.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
+            int rows = ps.executeUpdate();
 
-                return rows > 0;
-            } catch (SQLException e){
+            return rows > 0;
+        } catch (SQLException e){
             System.err.println("Register user error: " + e.getMessage());
             return false;}
         }

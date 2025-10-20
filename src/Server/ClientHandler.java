@@ -69,8 +69,11 @@ public class ClientHandler implements Runnable {
             }
 
             case "logout" -> {
-                boolean ok = userDAO.setOffline(currentUsername);
-                return new Response(true, "Đăng xuất thành công");
+                if (currentUsername != null) {
+                    userDAO.setOffline(currentUsername);
+                    currentUsername = null;
+                }
+                return new Response(true, "Đã đăng xuất");
             }
 
             default -> { return new Response(false, "Yêu cầu không hợp lệ"); }
