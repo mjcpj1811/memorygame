@@ -40,7 +40,7 @@ public class UserDAO {
                         rs.getString("username"),
                         rs.getString("password"),
                         rs.getString("email"),
-                        "ONLINE",
+                        rs.getString("status"),
                         rs.getTimestamp("createdAt")
                 );
             }
