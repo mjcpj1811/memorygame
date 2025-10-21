@@ -4,12 +4,14 @@ import Server.model.User;
 import Server.db.DatabaseConnection;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class UserDAO {
 
         public boolean registerUser (User user) {
-            String query = "INSERT INTO users (id, username, password, email, status, createdAt) VALUES (?, ?, ?, ?, ?, ?)";
+            String query = "INSERT INTO Users (id, username, password, email, status, createdAt) VALUES (?, ?, ?, ?, ?, ?)";
             try(Connection connection = DatabaseConnection.getConnection();
                 PreparedStatement ps = connection.prepareStatement(query)) {
                 ps.setString(1, UUID.randomUUID().toString());
@@ -63,6 +65,22 @@ public class UserDAO {
             ps.executeUpdate();
         } catch (SQLException e) {
             System.err.println("updateUserStatus error: " + e.getMessage());
+        }
+    }
+
+    public List<String> getAll() throws SQLException {
+        String sql = "SELECT * FROM users";
+        try (Connection conn = DatabaseConnection.getConnection()){
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            List<String> users = new ArrayList<>();
+            while(rs.next()){
+                users.add(rs.getString("username"));
+            }
+            return users;
+        } catch (SQLException e){
+            System.err.println("searchPlayer error: " + e.getMessage());
+            return new ArrayList<>();
         }
     }
 }
