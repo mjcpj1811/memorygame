@@ -11,6 +11,7 @@ public class AuthController {
         this.connection = connection;
     }
 
+
     public Response register(String username, String password, String email) {
         Request req = new Request("register");
         req.put("username", username);
