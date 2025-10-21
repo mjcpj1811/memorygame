@@ -89,7 +89,7 @@ public class LoginFrame extends JFrame {
             JOptionPane.showMessageDialog(this, res.getMessage());
             if (res.isSuccess()) {
                 dispose();
-                MainFrame mainFrame = new MainFrame(authController, u);
+                MainFrame mainFrame = new MainFrame(u);
                 mainFrame.setVisible(true);
             }
         });

@@ -68,14 +68,17 @@ public class UserDAO {
         }
     }
 
-    public List<String> getAll() throws SQLException {
+    public List<User> getAll() throws SQLException {
         String sql = "SELECT * FROM users";
         try (Connection conn = DatabaseConnection.getConnection()){
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-            List<String> users = new ArrayList<>();
+            List<User> users = new ArrayList<>();
             while(rs.next()){
-                users.add(rs.getString("username"));
+                User user = new User();
+                user.setUsername(rs.getString("username"));
+                user.setStatus(rs.getString("status"));
+                users.add(user);
             }
             return users;
         } catch (SQLException e){
