@@ -2,6 +2,7 @@ package Server;
 
 import common.Request;
 import common.Response;
+import Server.DAO.MatchDAO;
 import Server.DAO.UserDAO;
 import Server.model.User;
 
@@ -14,6 +15,7 @@ public class ClientHandler implements Runnable {
     private ObjectInputStream input;
     private ObjectOutputStream output;
     private UserDAO userDAO = new UserDAO();
+    private MatchDAO matchDAO = new MatchDAO();
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
@@ -61,6 +63,12 @@ public class ClientHandler implements Runnable {
                     return res;
                 }
                 return new Response(false, "Sai tên đăng nhập hoặc mật khẩu");
+            }
+
+            case "get_history" -> {
+                Response res = new Response(true, "Lịch sử trận đấu");
+                res.put("history", matchDAO.getMatchHistory());
+                return res;
             }
 
             default -> { return new Response(false, "Yêu cầu không hợp lệ"); }

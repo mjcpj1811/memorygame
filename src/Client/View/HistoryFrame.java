@@ -1,211 +1,136 @@
 package Client.View;
 
 import Client.Controller.HistoryController;
-import Server.model.MatchDetail;
 import common.Response;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
+import java.util.Map;
 
 public class HistoryFrame extends JFrame {
     private final HistoryController historyController;
-    private JTable historyTable;
     private DefaultTableModel tableModel;
-    private JComboBox<String> filterComboBox;
-    private JTextField searchField;
-    
+    private JTable historyTable;
+
     public HistoryFrame(HistoryController historyController) {
         this.historyController = historyController;
         init();
-        loadMatchHistory();
+        loadHistory();
     }
-    
+
     private void init() {
-        setTitle("Memory Game - Lịch sử trận đấu");
-        setSize(800, 500);
+        setTitle("Memory Game - Match History");
+        setSize(1000, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        
-        // Tạo tiêu đề
-        JLabel titleLabel = new JLabel("Lịch sử trận đấu", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        titleLabel.setForeground(new Color(44, 62, 80));
-        
-        // Tạo panel điều khiển
-        JPanel controlPanel = createControlPanel();
-        
-        // Tạo bảng lịch sử
-        createHistoryTable();
-        JScrollPane scrollPane = new JScrollPane(historyTable);
-        
-        // Tạo panel nút
-        JPanel buttonPanel = createButtonPanel();
-        
-        // Tạo panel chính
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(Color.WHITE);
-        mainPanel.add(titleLabel, BorderLayout.NORTH);
-        mainPanel.add(controlPanel, BorderLayout.CENTER);
-        mainPanel.add(scrollPane, BorderLayout.CENTER);
-        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
-        
-        add(mainPanel);
-    }
-    
-    private JPanel createControlPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panel.setBackground(Color.WHITE);
-        
-        // ComboBox lọc
-        filterComboBox = new JComboBox<>(new String[]{"Tất cả", "Top 10", "Top 20"});
-        filterComboBox.setPreferredSize(new Dimension(100, 30));
-        
-        // TextField tìm kiếm
-        searchField = new JTextField(15);
-        searchField.setPreferredSize(new Dimension(150, 30));
-        
-        // Nút tìm kiếm
-        JButton searchButton = new JButton("Tìm kiếm");
-        searchButton.setBackground(new Color(41, 128, 185));
-        searchButton.setForeground(Color.WHITE);
-        searchButton.setFocusPainted(false);
-        searchButton.setPreferredSize(new Dimension(80, 30));
-        
-        // Nút làm mới
-        JButton refreshButton = new JButton("Làm mới");
-        refreshButton.setBackground(new Color(41, 128, 185));
-        refreshButton.setForeground(Color.WHITE);
-        refreshButton.setFocusPainted(false);
-        refreshButton.setPreferredSize(new Dimension(80, 30));
-        
-        panel.add(new JLabel("Lọc:"));
-        panel.add(filterComboBox);
-        panel.add(new JLabel("Tìm:"));
-        panel.add(searchField);
-        panel.add(searchButton);
-        panel.add(refreshButton);
-        
-        // Event listeners
-        filterComboBox.addActionListener(e -> applyFilter());
-        searchButton.addActionListener(e -> searchByUsername());
-        refreshButton.addActionListener(e -> loadMatchHistory());
-        
-        return panel;
-    }
-    
-    private void createHistoryTable() {
-        String[] columnNames = {"Match ID", "Người chơi 1", "Người chơi 2", "Điểm số", "Thời gian chơi", "Thời gian tạo", "Người chiến thắng"};
+
+        // Title
+        JLabel lblTitle = new JLabel("Match History", SwingConstants.CENTER);
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        lblTitle.setForeground(new Color(52, 73, 94));
+        lblTitle.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
+
+        // Table setup
+        String[] columnNames = {"Match ID", "Player 1", "Player 2", "Score", "Time P1 (s)", "Time P2 (s)", "Date"};
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
-        
+
         historyTable = new JTable(tableModel);
-        historyTable.setRowHeight(25);
-        historyTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        
-        // Đặt độ rộng cột
-        historyTable.getColumnModel().getColumn(0).setPreferredWidth(90);  // Match ID
-        historyTable.getColumnModel().getColumn(1).setPreferredWidth(120); // Người chơi 1
-        historyTable.getColumnModel().getColumn(2).setPreferredWidth(120); // Người chơi 2
-        historyTable.getColumnModel().getColumn(3).setPreferredWidth(100); // Điểm số
-        historyTable.getColumnModel().getColumn(4).setPreferredWidth(100); // Thời gian chơi
-        historyTable.getColumnModel().getColumn(5).setPreferredWidth(120); // Thời gian tạo
-        historyTable.getColumnModel().getColumn(6).setPreferredWidth(120); // Người chiến thắng
-        
-        // Style cho bảng
         historyTable.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        historyTable.setRowHeight(25);
         historyTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        historyTable.getTableHeader().setBackground(new Color(52, 73, 94));
+        historyTable.getTableHeader().setForeground(Color.WHITE);
+
+        // Set column widths
+        historyTable.getColumnModel().getColumn(0).setPreferredWidth(200);
+        historyTable.getColumnModel().getColumn(1).setPreferredWidth(150);
+        historyTable.getColumnModel().getColumn(2).setPreferredWidth(150);
+        historyTable.getColumnModel().getColumn(3).setPreferredWidth(100);
+        historyTable.getColumnModel().getColumn(4).setPreferredWidth(100);
+        historyTable.getColumnModel().getColumn(5).setPreferredWidth(100);
+        historyTable.getColumnModel().getColumn(6).setPreferredWidth(180);
+
+        JScrollPane scrollPane = new JScrollPane(historyTable);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+
+        // Buttons panel
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 15));
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
+
+        JButton btnRefresh = new JButton("Refresh");
+        btnRefresh.setBackground(new Color(41, 128, 185));
+        btnRefresh.setForeground(Color.WHITE);
+        btnRefresh.setFocusPainted(false);
+        btnRefresh.setPreferredSize(new Dimension(120, 40));
+        btnRefresh.setFont(new Font("Segoe UI", Font.BOLD, 14));
+
+        JButton btnClose = new JButton("Close");
+        btnClose.setBackground(new Color(231, 76, 60));
+        btnClose.setForeground(Color.WHITE);
+        btnClose.setFocusPainted(false);
+        btnClose.setPreferredSize(new Dimension(120, 40));
+        btnClose.setFont(new Font("Segoe UI", Font.BOLD, 14));
+
+        buttonPanel.add(btnRefresh);
+        buttonPanel.add(btnClose);
+
+        // Main panel
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(Color.WHITE);
+        mainPanel.add(lblTitle, BorderLayout.NORTH);
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        add(mainPanel);
+
+        // Actions
+        btnRefresh.addActionListener(e -> loadHistory());
+        btnClose.addActionListener(e -> dispose());
     }
-    
-    private JPanel createButtonPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        panel.setBackground(Color.WHITE);
-        
-        JButton closeButton = new JButton("Đóng");
-        closeButton.setBackground(new Color(41, 128, 185));
-        closeButton.setForeground(Color.WHITE);
-        closeButton.setFocusPainted(false);
-        closeButton.setPreferredSize(new Dimension(100, 35));
-        
-        panel.add(closeButton);
-        
-        // Event listeners
-        closeButton.addActionListener(e -> dispose());
-        
-        return panel;
-    }
-    
-    private void loadMatchHistory() {
-        Response response = historyController.getMatchOverviews();
-        if (response.isSuccess()) {
-            @SuppressWarnings("unchecked")
-            List<Object[]> overviews = (List<Object[]>) response.getData().get("overviews");
-            updateTable(overviews);
-        } else {
-            JOptionPane.showMessageDialog(this, response.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-    
-    private void applyFilter() {
-        String selectedFilter = (String) filterComboBox.getSelectedItem();
-        Response response;
-        
-        // Giữ đơn giản: chỉ reload tất cả (có thể mở rộng sau)
-        response = historyController.getMatchOverviews();
-        
-        if (response.isSuccess()) {
-            @SuppressWarnings("unchecked")
-            List<Object[]> overviews = (List<Object[]>) response.getData().get("overviews");
-            updateTable(overviews);
-        } else {
-            JOptionPane.showMessageDialog(this, response.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-    
-    private void searchByUsername() {
-        String username = searchField.getText().trim();
-        if (username.isEmpty()) {
-            loadMatchHistory();
-            return;
-        }
-        
-        // Tìm kiếm trong dữ liệu hiện tại
-        DefaultTableModel model = (DefaultTableModel) historyTable.getModel();
-        int rowCount = model.getRowCount();
-        
-        for (int i = 0; i < rowCount; i++) {
-            String tableUsername = (String) model.getValueAt(i, 1);
-            if (tableUsername.toLowerCase().contains(username.toLowerCase())) {
-                historyTable.setRowSelectionInterval(i, i);
-                historyTable.scrollRectToVisible(historyTable.getCellRect(i, 0, true));
-                break;
+
+    private void loadHistory() {
+        try {
+            Response response = historyController.getMatchHistory();
+            
+            if (response.isSuccess()) {
+                tableModel.setRowCount(0); // Clear existing data
+                
+                @SuppressWarnings("unchecked")
+                List<Map<String, Object>> historyList = (List<Map<String, Object>>) response.get("history");
+                
+                if (historyList != null) {
+                    for (Map<String, Object> match : historyList) {
+                        String matchId = (String) match.get("match_id");
+                        String player1 = (String) match.get("player1");
+                        String player2 = (String) match.get("player2");
+                        String score = (String) match.get("score");
+                        String time1 = match.get("time1") != null ? String.format("%.2f", match.get("time1")) : "0.00";
+                        String time2 = match.get("time2") != null ? String.format("%.2f", match.get("time2")) : "0.00";
+                        String date = (String) match.get("date");
+
+                        tableModel.addRow(new Object[]{matchId, player1, player2, score, time1, time2, date});
+                    }
+                }
+                
+                JOptionPane.showMessageDialog(this, "Loaded " + tableModel.getRowCount() + " matches successfully!", 
+                    "Success", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, response.getMessage(), 
+                    "Error", JOptionPane.ERROR_MESSAGE);
             }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error loading history: " + e.getMessage(), 
+                "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }
-    
-    private void updateTable(List<Object[]> overviews) {
-        tableModel.setRowCount(0);
-        
-        if (overviews != null) {
-            for (int i = 0; i < overviews.size(); i++) {
-                Object[] o = overviews.get(i);
-                Object[] row = {
-                    o[0],
-                    o[1],
-                    o[3],
-                    String.valueOf(o[2]) + " - " + String.valueOf(o[4]),
-                    String.format("%.2f", (Double)o[5]) + " - " + String.format("%.2f", (Double)o[6]),
-                    o[7] != null ? o[7].toString() : "N/A",
-                    o[8]
-                };
-                tableModel.addRow(row);
-            }
-        }
-    }
-    
 }
+
