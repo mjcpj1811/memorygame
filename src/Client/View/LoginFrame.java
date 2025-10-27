@@ -86,8 +86,8 @@ public class LoginFrame extends JFrame {
                 return;
             }
             Response res = authController.login(u, pw);
-            JOptionPane.showMessageDialog(this, res.getMessage());
             if (res.isSuccess()) {
+                new HomeFrame(authController).setVisible(true);
                 dispose();
             }
         });

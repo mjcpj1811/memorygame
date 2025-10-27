@@ -12,7 +12,7 @@ public class HistoryController {
     }
 
     public Response getMatchHistory() {
-        Request req = new Request("get_history");
+        Request req = new Request("history.get_history");
         return connection.sendRequest(req);
     }
 }

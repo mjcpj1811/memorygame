@@ -8,20 +8,20 @@ import java.util.UUID;
 
 public class UserDAO {
 
-        public boolean registerUser (User user) {
-            String query = "INSERT INTO users (id, username, password, email, status, createdAt) VALUES (?, ?, ?, ?, ?, ?)";
-            try(Connection connection = DatabaseConnection.getConnection();
-                PreparedStatement ps = connection.prepareStatement(query)) {
-                ps.setString(1, UUID.randomUUID().toString());
-                ps.setString(2, user.getUsername());
-                ps.setString(3, user.getPassword());
-                ps.setString(4, user.getEmail());
-                ps.setString(5, "OFFLINE");
-                ps.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
-                int rows = ps.executeUpdate();
+    public boolean registerUser (User user) {
+        String query = "INSERT INTO users (id, username, password, email, status, createdAt) VALUES (?, ?, ?, ?, ?, ?)";
+        try(Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setString(1, UUID.randomUUID().toString());
+            ps.setString(2, user.getUsername());
+            ps.setString(3, user.getPassword());
+            ps.setString(4, user.getEmail());
+            ps.setString(5, "OFFLINE");
+            ps.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
+            int rows = ps.executeUpdate();
 
-                return rows > 0;
-            } catch (SQLException e){
+            return rows > 0;
+        } catch (SQLException e){
             System.err.println("Register user error: " + e.getMessage());
             return false;}
         }
@@ -40,7 +40,7 @@ public class UserDAO {
                         rs.getString("username"),
                         rs.getString("password"),
                         rs.getString("email"),
-                        "ONLINE",
+                        rs.getString("status"),
                         rs.getTimestamp("createdAt")
                 );
             }
@@ -49,20 +49,34 @@ public class UserDAO {
             return null;
         }
         if (user != null) {
-            updateUserStatus(username);
+            setOnline(username);
         }
         return user;
     }
 
 
-    public void updateUserStatus(String username) {
-        String sql = "UPDATE Users SET status='ONLINE' WHERE username=?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+    public void setOnline(String username) {
+        String query = "UPDATE Users SET status='ONLINE' WHERE username=?";
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setString(1, username);
             ps.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("updateUserStatus error: " + e.getMessage());
+            System.err.println("Set online error: " + e.getMessage());
         }
+    }
+
+    public boolean setOffline(String username){
+         String query = "UPDATE Users SET status='OFFLINE' WHERE username=?";
+         try (Connection connection = DatabaseConnection.getConnection();
+                PreparedStatement ps =connection.prepareStatement(query)){
+             ps.setString(1, username);
+             ps.executeUpdate();
+             return true;
+         }catch (SQLException e){
+             System.err.println("Set offline error: " + e.getMessage());
+             return false;
+         }
     }
 }
