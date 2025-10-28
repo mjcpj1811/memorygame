@@ -3,6 +3,7 @@ package Server;
 import Server.handler.*;
 import common.Request;
 import common.Response;
+import Server.DAO.UserDAO;
 
 import java.io.*;
 import java.net.Socket;
@@ -13,18 +14,12 @@ public class ClientHandler implements Runnable {
     private ObjectInputStream input;
     private ObjectOutputStream output;
 
-    private final HandlerRegistry registry = new HandlerRegistry();
+    private String currentUsername = null;
 
+    private final HandlerRegistry registry = new HandlerRegistry();
+    private final UserDAO userDAO = new UserDAO();
     public ClientHandler(Socket socket) {
         this.socket = socket;
-    }
-
-    public String getCurrentUsername() {
-        return currentUsername;
-    }
-
-    public void setCurrentUsername(String username) {
-        this.currentUsername = username;
     }
 
     @Override
@@ -36,12 +31,24 @@ public class ClientHandler implements Runnable {
 
             while (true) {
                 Request req = (Request) input.readObject();
-                Response res = routeRequest(req);
+                if ("login".equalsIgnoreCase(req.getAction())) {
+                    currentUsername = (String) req.get("username");
+                }
+
+//                if ("logout".equalsIgnoreCase(req.getAction())) {
+//                    String username = (String) req.get("username");
+//                    userDAO.setOffline(username);
+//                    break;
+//                }
+                Response res = handleRequest(req);
                 output.writeObject(res);
                 output.flush();
             }
         } catch (Exception e) {
             System.out.println("Client disconnected: " + e.getMessage());
+            if (currentUsername != null) {
+                userDAO.setOffline(currentUsername);
+            }
         }
     }
 

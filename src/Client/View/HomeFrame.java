@@ -10,9 +10,11 @@ import java.awt.*;
 
 public class HomeFrame extends JFrame {
     private final AuthController authController;
+    private final String username;
 
-    public HomeFrame(AuthController authController) {
+    public HomeFrame(AuthController authController, String username) {
         this.authController = authController;
+        this.username = username;
         init();
     }
 
@@ -46,10 +48,15 @@ public class HomeFrame extends JFrame {
 
         btnLogout.addActionListener(e -> {
             int choice = JOptionPane.showConfirmDialog(this, "Bạn có chắc muốn đăng xuất?", "Xác nhận", JOptionPane.YES_NO_OPTION);
-            Response res = authController.logout();
-            if (choice == JOptionPane.YES_OPTION && res.isSuccess()) {
-                dispose();
-                new LoginFrame(authController).setVisible(true);
+            if (choice == JOptionPane.YES_OPTION) {
+                Response res = authController.logout(username);
+                if (res.isSuccess()) {
+                    JOptionPane.showMessageDialog(this, "Đăng xuất thành công!");
+                    dispose();
+                    new LoginFrame(authController).setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Đăng xuất thất bại: ");
+                }
             }
         });
     }
