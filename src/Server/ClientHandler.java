@@ -1,6 +1,6 @@
 package Server;
 
-import Server.handlers.*;
+import Server.handler.*;
 import common.Request;
 import common.Response;
 
@@ -8,13 +8,12 @@ import java.io.*;
 import java.net.Socket;
 
 public class ClientHandler implements Runnable {
-    private final Socket socket;
+
+    private Socket socket;
     private ObjectInputStream input;
     private ObjectOutputStream output;
-    private String currentUsername = null;
 
-    private final AuthHandler authHandler = new AuthHandler(this);
-
+    private final HandlerRegistry registry = new HandlerRegistry();
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
@@ -43,21 +42,12 @@ public class ClientHandler implements Runnable {
             }
         } catch (Exception e) {
             System.out.println("Client disconnected: " + e.getMessage());
-        } finally {
-            if (currentUsername != null) {
-                authHandler.forceLogout(currentUsername);
-            }
-            try { socket.close(); } catch (IOException ignored) {}
         }
     }
 
-    private Response routeRequest(Request req) {
-        String action = req.getAction();
-
-        if (action.startsWith("auth.")) {
-            return authHandler.handle(req);
-        } else {
-            return new Response(false, "Yêu cầu không hợp lệ: " + action);
-        }
+    private Response handleRequest(Request req) {
+        RequestHandler handler = registry.getHandler(req.getAction());
+        if (handler != null) return handler.handle(req);
+        return new Response(false, "Action không hỗ trợ");
     }
 }
