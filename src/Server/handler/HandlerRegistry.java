@@ -11,6 +11,9 @@ public class HandlerRegistry {
     public HandlerRegistry() {
         register("login", new LoginHandler());
         register("register", new RegisterHandler());
+        register("logout", new LogoutHandler());
+        register("getHistory", new MatchHistoryHandler());
+
     }
 
     public void register(String action, RequestHandler handler) {

@@ -12,7 +12,7 @@ public class AuthController {
     }
 
     public Response register(String username, String password, String email) {
-        Request req = new Request("auth.register");
+        Request req = new Request("register");
         req.put("username", username);
         req.put("password", password);
         req.put("email", email);
@@ -20,14 +20,15 @@ public class AuthController {
     }
 
     public Response login(String username, String password) {
-        Request req = new Request("auth.login");
+        Request req = new Request("login");
         req.put("username", username);
         req.put("password", password);
         return connection.sendRequest(req);
     }
 
-    public Response logout() {
-        Request req = new Request("auth.logout");
+    public Response logout(String username) {
+        Request req = new Request("logout");
+        req.put("username", username);
         return connection.sendRequest(req);
     }
 }

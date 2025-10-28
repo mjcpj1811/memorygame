@@ -14,8 +14,9 @@ public class ClientConnection {
     public ClientConnection(String host, int port)  {
         try{
             socket = new Socket(host, port);
-            input = new ObjectInputStream(socket.getInputStream());
             output = new ObjectOutputStream(socket.getOutputStream());
+            output.flush();
+            input = new ObjectInputStream(socket.getInputStream());
         }catch(Exception e){
             e.printStackTrace();
             throw new RuntimeException("Cannot connect to server: " + e.getMessage());
