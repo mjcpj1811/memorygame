@@ -5,9 +5,11 @@ import common.Response;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.regex.Pattern;
 
 public class RegisterFrame extends JFrame {
     private final AuthController authController;
+    private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
 
     public RegisterFrame(AuthController authController) {
         this.authController = authController;
@@ -87,6 +89,12 @@ public class RegisterFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin");
                 return;
             }
+
+            if (!Pattern.matches(EMAIL_REGEX, email)) {
+                JOptionPane.showMessageDialog(this, "Email không hợp lệ! Vui lòng nhập đúng định dạng (vd: user@gmail.com)");
+                return;
+            }
+
             Response res = authController.register(u, pw, email);
             JOptionPane.showMessageDialog(this, res.getMessage());
             if (res.isSuccess()) {
@@ -94,6 +102,7 @@ public class RegisterFrame extends JFrame {
                 dispose();
             }
         });
+
 
         btnBack.addActionListener(e -> {
             new LoginFrame(authController).setVisible(true);

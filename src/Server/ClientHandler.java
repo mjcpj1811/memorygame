@@ -1,7 +1,6 @@
 package Server;
 
-import Server.handler.HandlerRegistry;
-import Server.handler.RequestHandler;
+import Server.handler.*;
 import common.Request;
 import common.Response;
 
@@ -20,6 +19,14 @@ public class ClientHandler implements Runnable {
         this.socket = socket;
     }
 
+    public String getCurrentUsername() {
+        return currentUsername;
+    }
+
+    public void setCurrentUsername(String username) {
+        this.currentUsername = username;
+    }
+
     @Override
     public void run() {
         try {
@@ -29,7 +36,7 @@ public class ClientHandler implements Runnable {
 
             while (true) {
                 Request req = (Request) input.readObject();
-                Response res = handleRequest(req);
+                Response res = routeRequest(req);
                 output.writeObject(res);
                 output.flush();
             }
